@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 16pt;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            font-size: 12pt;
+            text-decoration: underline;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .field {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: baseline;
+        }
+        
+        .label {
+            white-space: nowrap;
+            margin-right: 10px;
+        }
+        
+        .value {
+            border-bottom: 1px dotted #666;
+            flex: 1;
+            padding-left: 5px;
+        }
+        
+        .instructions {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 10pt;
+        }
+        
+        .instructions p {
+            margin: 5px 0;
+        }
+        
+        textarea-content {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+        
+        .notation {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        table {
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- PAGE 1 -->
+    <div class="page-break">
+        <h1>{{ texts.page1_title }}</h1>
+        
+        <h2>{{ texts.page1_collaborateur_label }}</h2>
+        <div class="field">
+            <span class="label">{{ texts.page1_nom_prenom_label }}</span>
+            <span class="value">{{ page1.collaborateur_nom }} {{ page1.collaborateur_prenom }}</span>
+        </div>
+        <div class="field">
+            <span class="label">{{ texts.page1_fonction_label }}</span>
+            <span class="value">{{ page1.collaborateur_fonction }}</span>
+        </div>
+        <div class="field">
+            <span class="label">{{ texts.page1_date_entree_label }}</span>
+            <span class="value">{{ page1.collaborateur_date_entree }}</span>
+        </div>
+        
+        <h2>{{ texts.page1_manager_label }}</h2>
+        <div class="field">
+            <span class="label">{{ texts.page1_nom_prenom_label }}</span>
+            <span class="value">{{ page1.manager_nom }} {{ page1.manager_prenom }}</span>
+        </div>
+        <div class="field">
+            <span class="label">{{ texts.page1_fonction_label }}</span>
+            <span class="value">{{ page1.manager_fonction }}</span>
+        </div>
+        
+        <div class="field" style="margin-top: 30px;">
+            <span class="label">{{ texts.page1_date_entretien_label }}</span>
+            <span class="value">{{ page1.date_entretien }}</span>
+        </div>
+    </div>
+    
+    <!-- PAGE 2 -->
+    <div class="page-break">
+        <h1>{{ texts.page2_title }}</h1>
+        
+        <div class="instructions whitespace-pre-wrap">{{ texts.page2_instructions }}</div>
+        
+        <h2>{{ texts.page2_resume_title }}</h2>
+        
+        <p class="bold">{{ texts.page2_clients_label }}</p>
+        <div class="textarea-content">{{ page2.commentaire or '' }}</div>
+        
+        <div style="margin-top: 20px;">
+            <p>{{ texts.page2_dossier_tech_label }}<span class="bold">{{ 'OUI' if page2.dossier_tech_a_jour else 'NON' }}</span></p>
+            <p>{{ texts.page2_dossier_transmis_label }}<span class="bold">{% if page2.dossier_tech_transmis is not none %}{{ 'OUI' if page2.dossier_tech_transmis else 'NON' }}{% endif %}</span></p>
+        </div>
+    </div>
+    
+    <!-- PAGE 3 -->
+    <div>
+        <h1>{{ texts.page3_title }}</h1>
+        
+        <h2>{{ texts.page3_appreciation_title }}</h2>
+        
+        <div class="instructions whitespace-pre-wrap">{{ texts.page3_instructions }}</div>
+        <p class="bold">{{ texts.page3_echelle_notation_title }}</p>
+        <li>{{ texts.page3_notation_4 }}</li>
+        <li>{{ texts.page3_notation_3 }}</li>
+        <li>{{ texts.page3_notation_2 }}</li>
+        <li>{{ texts.page3_notation_1 }}</li>
+        
+        <p class="bold">{{ texts.page3_objectifs_label }}</p>
+        <div class="textarea-content">{{ page3.objectif or '' }}</div>
+        
+        <table style="margin-top: 20px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; padding: 10px; border: 1px solid #ccc; vertical-align: top;">
+                    <p class="bold">{{ texts.page3_notation_collab_label }}</p>
+                    <p>Note : {{ page3.note_consultant or 'Non renseigné' }}</p>
+                </td>
+                <td style="width: 50%; padding: 10px; border: 1px solid #ccc; vertical-align: top;">
+                    <p class="bold">{{ texts.page3_notation_manager_label }}</p>
+                    <p>Note : {{ page3.note_manager or 'Non renseigné' }}</p>
+                </td>
+            </tr>
+        </table>
+        
+        <p class="bold" style="margin-top: 20px;">{{ texts.page3_commentaires_collab_label }}</p>
+        <div class="textarea-content">{{ page3.commentaire_consultant or '' }}</div>
+        
+        <p class="bold" style="margin-top: 20px;">{{ texts.page3_commentaires_manager_label }}</p>
+        <div class="textarea-content">{{ page3.commentaire_manager or '' }}</div>
+    </div>
+</body>
+</html>

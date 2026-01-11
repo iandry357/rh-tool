@@ -14,9 +14,9 @@ export interface EntretienAnnuelPage1 {
 }
 
 export interface EntretienAnnuelPage2 {
-  clients: string; // textarea pour la liste des clients
-  dossierTechniqueAJour: boolean;
-  dossierTechniqueTransmis: boolean | null;
+  clients: string;
+  dossierTechniqueAJour: boolean | string;  // Accepte les deux
+  dossierTechniqueTransmis: boolean | string | null;
 }
 
 export interface EntretienAnnuelPage3 {

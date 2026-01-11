@@ -62,3 +62,5 @@ frontend/.vercel
 # TypeScript
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
+
+data/

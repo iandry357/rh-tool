@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 16pt;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            font-size: 12pt;
+            text-decoration: underline;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .field {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: baseline;
+        }
+        
+        .label {
+            white-space: nowrap;
+            margin-right: 10px;
+        }
+        
+        .value {
+            border-bottom: 1px dotted #666;
+            flex: 1;
+            padding-left: 5px;
+        }
+        
+        .instructions {
+            background-color: #f5f5f5;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 10pt;
+        }
+        
+        .instructions p {
+            margin: 5px 0;
+        }
+        
+        textarea-content {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+        
+        .notation {
+            display: inline-block;
+            margin-right: 20px;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        table {
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .bold {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- PAGE 1 -->
+    <div class="page-break">
+        <h1>Entretien Annuel d'Appréciation</h1>
+        
+        <h2>Collaborateur :</h2>
+        <div class="field">
+            <span class="label">Nom, Prénom :</span>
+            <span class="value">{{ page1.collaborateur_nom }} {{ page1.collaborateur_prenom }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Fonction :</span>
+            <span class="value">{{ page1.collaborateur_fonction }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Date d'entrée dans l'entreprise :</span>
+            <span class="value">{{ page1.collaborateur_date_entree }}</span>
+        </div>
+        
+        <h2>Responsable hiérarchique :</h2>
+        <div class="field">
+            <span class="label">Nom, Prénom :</span>
+            <span class="value">{{ page1.manager_nom }} {{ page1.manager_prenom }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Fonction :</span>
+            <span class="value">{{ page1.manager_fonction }}</span>
+        </div>
+        
+        <div class="field" style="margin-top: 30px;">
+            <span class="label">Date de l'entretien :</span>
+            <span class="value">{{ page1.date_entretien }}</span>
+        </div>
+    </div>
+    
+    <!-- PAGE 2 -->
+    <div class="page-break">
+        <h1>Entretien Annuel d'Appréciation</h1>
+        
+        <div class="instructions">
+            <p>• L'Entretien Annuel d'Appréciation (EAA) est l'occasion de faire un point et de discuter avec le collaborateur à propos de son travail, de sa place et de son évolution chez Altim ; le collaborateur doit utiliser ce formulaire pour faire sa propre auto-évaluation avant l'entretien.</p>
+            <p class="bold">• Le salarié doit envoyer le formulaire pré-rempli minimum 3 jours avant l'entretien.</p>
+            <p>• Après l'EAA, ce document devra être signé par les 2 parties ; un scan sera remis au salarié et l'original au service RH.</p>
+        </div>
+        
+        <h2>1. Résumé de l'année</h2>
+        
+        <p class="bold">Nom du ou des Clients (ou Nom du service si Mission interne) dans l'ordre chronologique avec les mois associés :</p>
+        <div class="textarea-content">{{ page2.commentaire or '' }}</div>
+        
+        <div style="margin-top: 20px;">
+            <p>Avez-vous mis votre Dossier Technique à jour ? <span class="bold">{{ 'OUI' if page2.dossier_tech_a_jour else 'NON' }}</span></p>
+            <p>Si oui, l'avez-vous transmis à votre manager ? <span class="bold">{% if page2.dossier_tech_transmis is not none %}{{ 'OUI' if page2.dossier_tech_transmis else 'NON' }}{% endif %}</span></p>
+        </div>
+    </div>
+    
+    <!-- PAGE 3 -->
+    <div>
+        <h1>Entretien Annuel d'Appréciation</h1>
+        
+        <h2>2. Appréciation des objectifs de l'année passée</h2>
+        
+        <div class="instructions">
+            <p>→ Le salarié doit recopier dans la colonne « Missions de l'ordre de mission » tous les objectifs inscrits dans son (ou ses) ordre(s) de mission.</p>
+            <p class="bold">Échelle de notation :</p>
+            <ul style="margin-left: 20px;">
+                <li><strong>4 :</strong> Performance supérieure aux attentes : dépasse les performances attendues, les résultats sont de très grande qualité.</li>
+                <li><strong>3 :</strong> Performance correspondant pleinement aux besoins du poste : atteint systématiquement les attentes.</li>
+                <li><strong>2 :</strong> Performance acceptable qui nécessite une amélioration sur un ou plusieurs points essentiels.</li>
+                <li><strong>1 :</strong> Performance insuffisante par rapport aux besoins du poste.</li>
+            </ul>
+        </div>
+        
+        <p class="bold">Objectifs de l'ordre de mission (ou des ordres de mission de l'année)</p>
+        <div class="textarea-content">{{ page3.objectif or '' }}</div>
+        
+        <table style="margin-top: 20px; border-collapse: collapse;">
+            <tr>
+                <td style="width: 50%; padding: 10px; border: 1px solid #ccc; vertical-align: top;">
+                    <p class="bold">Notation globale - Collaborateur</p>
+                    <p>Note : {{ page3.note_consultant or 'Non renseigné' }}</p>
+                </td>
+                <td style="width: 50%; padding: 10px; border: 1px solid #ccc; vertical-align: top;">
+                    <p class="bold">Notation globale - Manager</p>
+                    <p>Note : {{ page3.note_manager or 'Non renseigné' }}</p>
+                </td>
+            </tr>
+        </table>
+        
+        <p class="bold" style="margin-top: 20px;">Commentaires du collaborateur (Détails, Exemples et Principaux points forts ou points à améliorer)</p>
+        <div class="textarea-content">{{ page3.commentaire_consultant or '' }}</div>
+        
+        <p class="bold" style="margin-top: 20px;">Commentaires du manager (Détails, Exemples et Principaux points forts ou points à améliorer)</p>
+        <div class="textarea-content">{{ page3.commentaire_manager or '' }}</div>
+    </div>
+</body>
+</html>

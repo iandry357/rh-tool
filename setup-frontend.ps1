@@ -14,3 +14,7 @@ Write-Host "Installation des dépendances..." -ForegroundColor Yellow
 npm install react-hook-form zod @hookform/resolvers axios
 
 Write-Host "✓ Setup terminé" -ForegroundColor Green
+
+
+New-Item -ItemType Directory -Path "frontend/lib" -Force | Out-Null
+New-Item -ItemType File -Path "frontend/lib/api.ts" -Force | Out-Null

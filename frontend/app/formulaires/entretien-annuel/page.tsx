@@ -3,16 +3,26 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { EntretienAnnuelPage1, EntretienAnnuelPage2, EntretienAnnuelPage3 } from '@/types/formulaires';
-import { createEntretien, getEntretien, updatePage1, updatePage2, updatePage3, validerEntretien, downloadPDF } from '@/lib/api';
+import { createEntretien, getEntretien, updatePage1, updatePage2, updatePage3, validerEntretien, downloadPDF, getTemplateTexts, getTextByKey, TemplateText } from '@/lib/api';
 
 export default function EntretienAnnuelPage() {
   const [currentPage, setCurrentPage] = useState<1 | 2 | 3>(1);
   const [entretienId, setEntretienId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [texts, setTexts] = useState<TemplateText[]>([]);
 
   const { register, handleSubmit, reset: resetForm1 } = useForm<EntretienAnnuelPage1>();
   const { register: register2, handleSubmit: handleSubmit2, reset: resetForm2 } = useForm<EntretienAnnuelPage2>();
   const { register: register3, handleSubmit: handleSubmit3, reset: resetForm3 } = useForm<EntretienAnnuelPage3>();
+
+  // Charger les textes
+  useEffect(() => {
+    const loadTexts = async () => {
+      const data = await getTemplateTexts();
+      setTexts(data);
+    };
+    loadTexts();
+  }, []);
 
   // Fonctions de sauvegarde sans redirection
   const savePage1 = async (data: EntretienAnnuelPage1) => {
@@ -154,112 +164,6 @@ export default function EntretienAnnuelPage() {
     }
   };
 
-  // const onSubmitPage1 = async (data: EntretienAnnuelPage1) => {
-  //   if (!entretienId) return;
-    
-  //   setLoading(true);
-  //   try {
-  //     await updatePage1(entretienId, {
-  //       collaborateur_nom: data.collaborateur.nom,
-  //       collaborateur_prenom: data.collaborateur.prenom,
-  //       collaborateur_fonction: data.collaborateur.fonction,
-  //       collaborateur_date_entree: data.collaborateur.dateEntree,
-  //       manager_nom: data.manager.nom,
-  //       manager_prenom: data.manager.prenom,
-  //       manager_fonction: data.manager.fonction,
-  //       date_entretien: data.dateEntretien,
-  //     });
-  //     setCurrentPage(2);
-  //   } catch (error) {
-  //     console.error('Erreur sauvegarde page 1:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const onSubmitPage2 = async (data: EntretienAnnuelPage2) => {
-  //   if (!entretienId) return;
-    
-  //   setLoading(true);
-  //   try {
-  //     await updatePage2(entretienId, {
-  //       commentaire: data.clients,
-  //       dossier_tech_a_jour: data.dossierTechniqueAJour,
-  //       dossier_tech_transmis: data.dossierTechniqueTransmis ?? undefined,
-  //     });
-  //     setCurrentPage(3);
-  //   } catch (error) {
-  //     console.error('Erreur sauvegarde page 2:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const onSubmitPage2 = async (data: EntretienAnnuelPage2) => {
-  //   if (!entretienId) return;
-    
-  //   setLoading(true);
-  //   try {
-  //     await updatePage2(entretienId, {
-  //       commentaire: data.clients,
-  //       dossier_tech_a_jour: data.dossierTechniqueAJour === 'true' || data.dossierTechniqueAJour === true,
-  //       dossier_tech_transmis: data.dossierTechniqueTransmis === 'true' || data.dossierTechniqueTransmis === true,
-  //     });
-  //     setCurrentPage(3);
-  //   } catch (error) {
-  //     console.error('Erreur sauvegarde page 2:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const onSubmitPage3 = async (data: EntretienAnnuelPage3) => {
-  //   if (!entretienId) return;
-    
-  //   setLoading(true);
-  //   try {
-  //     await updatePage3(entretienId, {
-  //       objectif: data.objectifsMission,
-  //       note_consultant: data.notationCollaborateur ? Number(data.notationCollaborateur) : undefined,
-  //       commentaire_consultant: data.commentairesCollaborateur,
-  //       note_manager: data.notationManager ? Number(data.notationManager) : undefined,
-  //       commentaire_manager: data.commentairesManager,
-  //     });
-      
-  //     await validerEntretien(entretienId);
-  //     alert('Formulaire validé avec succès !');
-  //   } catch (error) {
-  //     console.error('Erreur validation:', error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const PageNavigation = () => (
-  //   <div className="mb-6 pb-4 border-b flex gap-2">
-  //     <button
-  //       type="button"
-  //       onClick={() => setCurrentPage(1)}
-  //       className={`px-4 py-2 rounded ${currentPage === 1 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-  //     >
-  //       Page 1
-  //     </button>
-  //     <button
-  //       type="button"
-  //       onClick={() => setCurrentPage(2)}
-  //       className={`px-4 py-2 rounded ${currentPage === 2 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-  //     >
-  //       Page 2
-  //     </button>
-  //     <button
-  //       type="button"
-  //       onClick={() => setCurrentPage(3)}
-  //       className={`px-4 py-2 rounded ${currentPage === 3 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-  //     >
-  //       Page 3
-  //     </button>
-  //   </div>
-  // );
 
   const PageNavigation = () => {
     const handlePageChange = async (targetPage: 1 | 2 | 3) => {
@@ -332,17 +236,20 @@ export default function EntretienAnnuelPage() {
   if (currentPage === 1) {
     return (
       <div id="page-1" className="max-w-4xl mx-auto p-8 bg-white">
-        <h1 className="text-xl font-bold text-center mb-8">Entretien Annuel d'Appréciation</h1>
+        {/* <h1 className="text-xl font-bold text-center mb-8">Entretien Annuel d'Appréciation</h1> */}
+        <h1 className="text-xl font-bold text-center mb-8">
+          {getTextByKey(texts, 'page1_title')}
+        </h1>
 
         <PageNavigation />
         
         <form onSubmit={handleSubmit(onSubmitPage1)} className="space-y-6">
           {/* Collaborateur */}
           <div className="space-y-4">
-            <h2 className="font-bold underline">Collaborateur :</h2>
+            <h2 className="font-bold underline">{getTextByKey(texts, 'page1_collaborateur_label')}</h2>
             
             <div className="flex items-baseline gap-2">
-              <span className="whitespace-nowrap">Nom, Prénom :</span>
+              <span className="whitespace-nowrap">{getTextByKey(texts, 'page1_nom_prenom_label')}</span>
               <input 
                 {...register('collaborateur.nom')}
                 placeholder="Nom"
@@ -356,7 +263,7 @@ export default function EntretienAnnuelPage() {
             </div>
 
             <div className="flex items-baseline gap-2">
-              <span className="whitespace-nowrap">Fonction :</span>
+              <span className="whitespace-nowrap">{getTextByKey(texts, 'page1_fonction_label')}</span>
               <input 
                 {...register('collaborateur.fonction')}
                 className="flex-1 border-b border-dotted border-gray-400 outline-none focus:border-gray-600 px-1"
@@ -364,7 +271,7 @@ export default function EntretienAnnuelPage() {
             </div>
 
             <div className="flex items-baseline gap-2">
-              <span className="whitespace-nowrap">Date d'entrée dans l'entreprise :</span>
+              <span className="whitespace-nowrap">{getTextByKey(texts, 'page1_date_entree_label')}</span>
               <input 
                 type="date"
                 {...register('collaborateur.dateEntree')}
@@ -375,10 +282,10 @@ export default function EntretienAnnuelPage() {
 
           {/* Manager */}
           <div className="space-y-4 mt-8">
-            <h2 className="font-bold underline">Responsable hiérarchique :</h2>
+            <h2 className="font-bold underline">{getTextByKey(texts, 'page1_manager_label')}</h2>
             
             <div className="flex items-baseline gap-2">
-              <span className="whitespace-nowrap">Nom, Prénom :</span>
+              <span className="whitespace-nowrap">{getTextByKey(texts, 'page1_nom_prenom_label')}</span>
               <input 
                 {...register('manager.nom')}
                 placeholder="Nom"
@@ -392,7 +299,7 @@ export default function EntretienAnnuelPage() {
             </div>
 
             <div className="flex items-baseline gap-2">
-              <span className="whitespace-nowrap">Fonction :</span>
+              <span className="whitespace-nowrap">{getTextByKey(texts, 'page1_fonction_label')}</span>
               <input 
                 {...register('manager.fonction')}
                 className="flex-1 border-b border-dotted border-gray-400 outline-none focus:border-gray-600 px-1"
@@ -402,7 +309,7 @@ export default function EntretienAnnuelPage() {
 
           {/* Date entretien */}
           <div className="flex items-baseline gap-2 mt-8">
-            <span className="whitespace-nowrap">Date de l'entretien :</span>
+            <span className="whitespace-nowrap">{getTextByKey(texts, 'page1_date_entretien_label')}</span>
             <input 
               type="date"
               {...register('dateEntretien')}
@@ -440,26 +347,24 @@ export default function EntretienAnnuelPage() {
   } else if (currentPage === 2) {
     return (
       <div id="page-2" className="max-w-4xl mx-auto p-8 bg-white">
-        <h1 className="text-xl font-bold text-center mb-8">Entretien Annuel d'Appréciation</h1>
+        <h1 className="text-xl font-bold text-center mb-8">{getTextByKey(texts, 'page2_title')}</h1>
 
         <PageNavigation />
         
         <form onSubmit={handleSubmit2(onSubmitPage2)} className="space-y-6">
           <label className="block mb-2 font-semibold">
-            Note pour les managers et les collaborateurs
+            {getTextByKey(texts, 'page2_note_manager_collab_label')}
           </label>
-          <div className="text-sm space-y-2 bg-gray-50 p-4 rounded">
-            <p>• L'Entretien Annuel d'Appréciation (EAA) est l'occasion de faire un point et de discuter avec le collaborateur à propos de son travail, de sa place et de son évolution chez Altim ; le collaborateur doit utiliser ce formulaire pour faire sa propre auto-évaluation avant l'entretien.</p>
-            <p className="font-bold">• Le salarié doit envoyer le formulaire pré-rempli minimum 3 jours avant l'entretien.</p>
-            <p>• Après l'EAA, ce document devra être signé par les 2 parties ; un scan sera remis au salarié et l'original au service RH.</p>
+          <div className="text-sm space-y-2 bg-gray-50 p-4 rounded whitespace-pre-wrap">
+            {getTextByKey(texts, 'page2_instructions')}
           </div>
 
           <div className="space-y-4">
-            <h2 className="font-bold">1. Résumé de l'année</h2>
+            <h2 className="font-bold">{getTextByKey(texts, 'page2_resume_title')}</h2>
             
             <div>
               <label className="block mb-2">
-                Nom du ou des Clients (ou Nom du service si Mission interne) dans l'ordre chronologique avec les mois associés :
+                {getTextByKey(texts, 'page2_clients_label')}
               </label>
               <textarea
                 {...register2('clients')}
@@ -471,7 +376,7 @@ export default function EntretienAnnuelPage() {
 
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span>Avez-vous mis votre Dossier Technique à jour ?</span>
+                <span>{getTextByKey(texts, 'page2_dossier_tech_label')}</span>
                   <label className="flex items-center gap-1">
                     <input 
                       type="radio" 
@@ -491,7 +396,7 @@ export default function EntretienAnnuelPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span>Si oui, l'avez-vous transmis à votre manager ?</span>
+                <span>{getTextByKey(texts, 'page2_dossier_transmis_label')}</span>
                 <label className="flex items-center gap-1">
                   <input 
                     type="radio" 
@@ -538,28 +443,30 @@ export default function EntretienAnnuelPage() {
   } else if (currentPage === 3) {
     return (
       <div id="page-3" className="max-w-4xl mx-auto p-8 bg-white">
-        <h1 className="text-xl font-bold text-center mb-8">Entretien Annuel d'Appréciation</h1>
+        <h1 className="text-xl font-bold text-center mb-8">{getTextByKey(texts, 'page3_title')}</h1>
 
         <PageNavigation />
         
         <form onSubmit={handleSubmit3(onSubmitPage3)} className="space-y-6">
           <div className="space-y-4">
-            <h2 className="font-bold">2. Appréciation des objectifs de l'année passée</h2>
+            <h2 className="font-bold">{getTextByKey(texts, 'page3_appreciation_title')}</h2>
+
             
-            <div className="text-sm bg-gray-50 p-4 rounded space-y-2">
-              <p>→ Le salarié doit recopier dans la colonne « Missions de l'ordre de mission » tous les objectifs inscrits dans son (ou ses) ordre(s) de mission.</p>
-              <p className="font-bold">Échelle de notation :</p>
+            
+            <div className="text-sm bg-gray-50 p-4 rounded space-y-2 whitespace-pre-wrap">
+              {getTextByKey(texts, 'page3_instructions')}
+              <p className="font-bold">{getTextByKey(texts, 'page3_echelle_notation_title')}</p>
               <ul className="space-y-1 ml-4">
-                <li><strong>4 :</strong> Performance supérieure aux attentes : dépasse les performances attendues, les résultats sont de très grande qualité.</li>
-                <li><strong>3 :</strong> Performance correspondant pleinement aux besoins du poste : atteint systématiquement les attentes.</li>
-                <li><strong>2 :</strong> Performance acceptable qui nécessite une amélioration sur un ou plusieurs points essentiels.</li>
-                <li><strong>1 :</strong> Performance insuffisante par rapport aux besoins du poste.</li>
+                <li>{getTextByKey(texts, 'page3_notation_4')}</li>
+                <li>{getTextByKey(texts, 'page3_notation_3')}</li>
+                <li>{getTextByKey(texts, 'page3_notation_2')}</li>
+                <li>{getTextByKey(texts, 'page3_notation_1')}</li>
               </ul>
             </div>
 
             <div>
               <label className="block mb-2 font-semibold">
-                Objectifs de l'ordre de mission (ou des ordres de mission de l'année)
+                {getTextByKey(texts, 'page3_objectifs_label')}
               </label>
               <textarea
                 {...register3('objectifsMission')}
@@ -571,7 +478,7 @@ export default function EntretienAnnuelPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block mb-2 font-semibold">Notation globale - Collaborateur</label>
+                <label className="block mb-2 font-semibold">{getTextByKey(texts, 'page3_notation_collab_label')}</label>
                 <div className="flex gap-4">
                   {[1, 2, 3, 4].map(note => (
                     <label key={note} className="flex items-center gap-1">
@@ -585,9 +492,23 @@ export default function EntretienAnnuelPage() {
                   ))}
                 </div>
               </div>
+            </div>
 
+            <div>
+              <label>
+                {getTextByKey(texts, 'page3_commentaires_collab_label')}
+              </label>
+              <textarea
+                {...register3('commentairesCollaborateur')}
+                rows={4}
+                className="w-full border border-gray-300 p-3 rounded outline-none focus:border-gray-600"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              
               <div>
-                <label className="block mb-2 font-semibold">Notation globale - Manager</label>
+                <label className="block mb-2 font-semibold">{getTextByKey(texts, 'page3_notation_manager_label')}</label>
                 <div className="flex gap-4">
                   {[1, 2, 3, 4].map(note => (
                     <label key={note} className="flex items-center gap-1">
@@ -604,19 +525,8 @@ export default function EntretienAnnuelPage() {
             </div>
 
             <div>
-              <label className="block mb-2 font-semibold">
-                Commentaires du collaborateur (Détails, Exemples et Principaux points forts ou points à améliorer)
-              </label>
-              <textarea
-                {...register3('commentairesCollaborateur')}
-                rows={4}
-                className="w-full border border-gray-300 p-3 rounded outline-none focus:border-gray-600"
-              />
-            </div>
-
-            <div>
-              <label className="block mb-2 font-semibold">
-                Commentaires du manager (Détails, Exemples et Principaux points forts ou points à améliorer)
+              <label>
+                {getTextByKey(texts, 'page3_commentaires_manager_label')}
               </label>
               <textarea
                 {...register3('commentairesManager')}

@@ -47,7 +47,7 @@ def generate_pdf(entretien_id: int, db: Session = Depends(get_db)):
     }
     
     # Générer le PDF
-    pdf_bytes = generate_entretien_pdf(data)
+    pdf_bytes = generate_entretien_pdf(data, db)
     
     # Retourner le PDF
     filename = f"entretien_annuel_{entretien.collaborateur_nom}_{entretien.collaborateur_prenom}.pdf"

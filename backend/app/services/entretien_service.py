@@ -81,8 +81,28 @@ def delete_entretien(db: Session, entretien_id: int) -> bool:
     db.commit()
     return True
 
+# def list_entretiens(db: Session, statut: str = None, skip: int = 0, limit: int = 100):
+#     query = db.query(EntretienAnnuel)
+#     if statut:
+#         query = query.filter(EntretienAnnuel.statut == statut)
+#     return query.offset(skip).limit(limit).all()
+
 def list_entretiens(db: Session, statut: str = None, skip: int = 0, limit: int = 100):
     query = db.query(EntretienAnnuel)
     if statut:
         query = query.filter(EntretienAnnuel.statut == statut)
-    return query.offset(skip).limit(limit).all()
+    
+    entretiens = query.order_by(EntretienAnnuel.date_entretien.desc()).offset(skip).limit(limit).all()
+    
+    return [{
+        "id": e.id,
+        "collaborateur_nom": e.collaborateur_nom,
+        "collaborateur_prenom": e.collaborateur_prenom,
+        "collaborateur_fonction": e.collaborateur_fonction,
+        "manager_nom": e.manager_nom,
+        "manager_prenom": e.manager_prenom,
+        "date_entretien": e.date_entretien.isoformat() if e.date_entretien else None,
+        "statut": e.statut,
+        "note_consultant": e.appreciation_objectif.note_consultant if e.appreciation_objectif else None,
+        "note_manager": e.appreciation_objectif.note_manager if e.appreciation_objectif else None,
+    } for e in entretiens]

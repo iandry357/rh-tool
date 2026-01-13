@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { EntretienAnnuelPage1, EntretienAnnuelPage2, EntretienAnnuelPage3 } from '@/types/formulaires';
 import { createEntretien, getEntretien, updatePage1, updatePage2, updatePage3, validerEntretien, downloadPDF, getTemplateTexts, getTextByKey, TemplateText } from '@/lib/api';
 import { useSearchParams } from 'next/navigation'
 
-export default function EntretienAnnuelPage() {
+function EntretienForm() {
   const [currentPage, setCurrentPage] = useState<1 | 2 | 3>(1);
   const searchParams = useSearchParams()
   const [entretienId, setEntretienId] = useState<number | null>(null);
@@ -600,6 +600,14 @@ export default function EntretienAnnuelPage() {
       </div>
     );
   }
-
+  
   return <div>Chargement...</div>;
+}
+
+export default function EntretienAnnuelPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <EntretienForm />
+    </Suspense>
+  ); 
 }

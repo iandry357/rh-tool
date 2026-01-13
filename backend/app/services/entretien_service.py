@@ -105,4 +105,6 @@ def list_entretiens(db: Session, statut: str = None, skip: int = 0, limit: int =
         "statut": e.statut,
         "note_consultant": e.appreciation_objectif.note_consultant if e.appreciation_objectif else None,
         "note_manager": e.appreciation_objectif.note_manager if e.appreciation_objectif else None,
+        "commentaire_consultant": e.appreciation_objectif.commentaire_consultant if e.appreciation_objectif else None,
+        "commentaire_manager": e.appreciation_objectif.commentaire_manager if e.appreciation_objectif else None,
     } for e in entretiens]

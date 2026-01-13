@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { EntretienAnnuelPage1, EntretienAnnuelPage2, EntretienAnnuelPage3 } from '@/types/formulaires';
 import { createEntretien, getEntretien, updatePage1, updatePage2, updatePage3, validerEntretien, downloadPDF, getTemplateTexts, getTextByKey, TemplateText } from '@/lib/api';
+import { useSearchParams } from 'next/navigation'
 
 export default function EntretienAnnuelPage() {
   const [currentPage, setCurrentPage] = useState<1 | 2 | 3>(1);
+  const searchParams = useSearchParams()
   const [entretienId, setEntretienId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [texts, setTexts] = useState<TemplateText[]>([]);
@@ -14,6 +16,16 @@ export default function EntretienAnnuelPage() {
   const { register, handleSubmit, reset: resetForm1 } = useForm<EntretienAnnuelPage1>();
   const { register: register2, handleSubmit: handleSubmit2, reset: resetForm2 } = useForm<EntretienAnnuelPage2>();
   const { register: register3, handleSubmit: handleSubmit3, reset: resetForm3 } = useForm<EntretienAnnuelPage3>();
+
+  // useEffect(() => {
+  //   document.title = 'Entretien'
+  // }, [])
+  
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      document.title = 'Entretien';
+    }, 0);
+  }
 
   // Charger les textes
   useEffect(() => {
@@ -23,6 +35,33 @@ export default function EntretienAnnuelPage() {
     };
     loadTexts();
   }, []);
+
+  // Récupérer le paramètre id
+  // useEffect(() => {
+  //   const id = searchParams.get('id')
+  //   if (id) {
+  //     setEntretienId(parseInt(id))
+  //   }
+  // }, [searchParams])
+  useEffect(() => {
+  const id = searchParams.get('id')
+  
+  if (id) {
+    // Mode édition
+    setEntretienId(parseInt(id))
+  } else {
+    // Mode création uniquement si pas d'ID dans URL
+    const initEntretien = async () => {
+      try {
+        const result = await createEntretien();
+        setEntretienId(result.id);
+      } catch (error) {
+        console.error('Erreur création entretien:', error);
+      }
+    };
+    initEntretien();
+  }
+}, [searchParams])
 
   // Fonctions de sauvegarde sans redirection
   const savePage1 = async (data: EntretienAnnuelPage1) => {
@@ -48,7 +87,7 @@ export default function EntretienAnnuelPage() {
     try {
       await updatePage2(entretienId, {
         commentaire: data.clients,
-        dossier_tech_a_jour: data.dossierTechniqueAJour === 'true' || data.dossierTechniqueAJour === true ? true : false,
+        dossier_tech_a_jour: data.dossierTechniqueAJour === 'true' || data.dossierTechniqueAJour === true ? true : (data.dossierTechniqueAJour === 'false' || data.dossierTechniqueAJour === false ? false : undefined),
         dossier_tech_transmis: data.dossierTechniqueTransmis === 'true' || data.dossierTechniqueTransmis === true ? true : (data.dossierTechniqueTransmis === 'false' || data.dossierTechniqueTransmis === false ? false : undefined),
       });
     } catch (error) {
@@ -73,17 +112,18 @@ export default function EntretienAnnuelPage() {
 
 
   // Créer un entretien au chargement
-  useEffect(() => {
-    const initEntretien = async () => {
-      try {
-        const result = await createEntretien();
-        setEntretienId(result.id);
-      } catch (error) {
-        console.error('Erreur création entretien:', error);
-      }
-    };
-    initEntretien();
-  }, []);
+  // useEffect(() => {
+  //   const initEntretien = async () => {
+  //     if (entretienId) return;
+  //     try {
+  //       const result = await createEntretien();
+  //       setEntretienId(result.id);
+  //     } catch (error) {
+  //       console.error('Erreur création entretien:', error);
+  //     }
+  //   };
+  //   initEntretien();
+  // }, []);
 
   // Charger les données quand on a l'ID
   useEffect(() => {

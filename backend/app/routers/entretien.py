@@ -20,6 +20,7 @@ def create_entretien(db: Session = Depends(get_db)):
 def get_entretien(entretien_id: int, db: Session = Depends(get_db)):
     """Récupérer un entretien complet"""
     entretien = entretien_service.get_entretien(db, entretien_id)
+    print(entretien.id, entretien.statut, entretien.collaborateur_nom)
     if not entretien:
         raise HTTPException(status_code=404, detail="Entretien non trouvé")
     
@@ -91,6 +92,7 @@ def delete_entretien(entretien_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Entretien non trouvé")
     return {"message": "Entretien supprimé"}
+
 
 @router.get("/")
 def list_entretiens(statut: str = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

@@ -9,6 +9,16 @@ export default function AdminTemplatesPage() {
   const [editValue, setEditValue] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // useEffect(() => {
+  //   document.title = 'Custom template'
+  // }, [])
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      document.title = 'Custom template';
+    }, 0);
+  }
+
+
   useEffect(() => {
     loadTexts();
   }, []);

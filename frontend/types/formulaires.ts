@@ -15,7 +15,7 @@ export interface EntretienAnnuelPage1 {
 
 export interface EntretienAnnuelPage2 {
   clients: string;
-  dossierTechniqueAJour: boolean | string;  // Accepte les deux
+  dossierTechniqueAJour: boolean | string | null;  // Accepte les deux
   dossierTechniqueTransmis: boolean | string | null;
 }
 

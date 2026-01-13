@@ -59,10 +59,13 @@ export interface EntretienListItem {
   collaborateur_fonction: string;
   manager_nom: string;
   manager_prenom: string;
+  manager_fonction: string;
   date_entretien: string;
   statut: string;
   note_consultant: number | null;
   note_manager: number | null;
+  commentaire_consultant: string | null;
+  commentaire_manager: string | null;
 }
 
 // API calls
@@ -100,6 +103,15 @@ export const deleteEntretien = async (id: number) => {
   const response = await api.delete(`/entretiens/${id}`);
   return response.data;
 };
+// export const deleteEntretien = async (id: number): Promise<void> => {
+//   const response = await api.delete(`/entretiens/${id}`, {
+//     method: 'DELETE',
+//   });
+  
+//   if (!response.ok) {
+//     throw new Error('Erreur suppression entretien');
+//   }
+// };
 
 export const listEntretiens = async (statut?: string) => {
   const params = statut ? { statut } : {};
